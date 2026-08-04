@@ -32,5 +32,10 @@ COPY --from=builder /usr/local/bin/notion-mcp-server /usr/local/bin/notion-mcp-s
 # Set default environment variables
 ENV OPENAPI_MCP_HEADERS="{}"
 
-# Set entrypoint
+# Zeabur exposes this HTTP port
+EXPOSE 3000
+
+# Run the MCP server over Streamable HTTP.
+# NOTION_TOKEN and AUTH_TOKEN are supplied through Zeabur environment variables.
 ENTRYPOINT ["notion-mcp-server"]
+CMD ["--transport", "http", "--host", "0.0.0.0", "--port", "3000"]
