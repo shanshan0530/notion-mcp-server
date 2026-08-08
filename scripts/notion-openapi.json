@@ -2400,8 +2400,8 @@
         "security": []
       },
       "patch": {
-        "summary": "Update a page's content as Markdown",
-        "description": "Update the content of a Notion page using enhanced Markdown. Prefer `replace_content` to overwrite the whole page or `update_content` for targeted find-and-replace edits.",
+        "summary": "Update a page using enhanced Markdown. For append-only records such as journals, reflections, and running logs, use `insert_content` with `position: {\"type\": \"end\"}` and do not retrieve the page first. Use `update_content` for targeted find-and-replace edits after reading existing content, or `replace_content` only when intentionally overwriting the whole page. Pass the matching operation parameter as a structured object, not as a JSON-encoded string.",
+        "description": "Update a Notion page using enhanced Markdown. For append-only records such as journals, reflections, and running logs, use `insert_content` with `position: {\"type\": \"end\"}` and do not retrieve the page first. Use `update_content` for targeted find-and-replace edits after reading the existing content, or `replace_content` only when intentionally overwriting the whole page. The matching operation parameter must be passed as a structured object, not as a JSON-encoded string.",
         "operationId": "update-page-markdown",
         "tags": [
           "Pages"
@@ -2437,7 +2437,7 @@
                 "required": [
                   "type"
                 ],
-                "description": "Specify exactly one edit operation. Set `type` to the operation name and provide the matching object.",
+                "description": "Specify exactly one edit operation. Set `type` to the operation name and provide the matching parameter as a structured object, never as a JSON-encoded string. Append-only writes should use `insert_content` at the end without retrieving the page first; only targeted `update_content` edits require reading existing content first.",
                 "properties": {
                   "type": {
                     "type": "string",
@@ -2447,14 +2447,14 @@
                       "insert_content",
                       "replace_content_range"
                     ],
-                    "description": "The kind of edit to apply. Prefer `replace_content` (overwrite the whole page) or `update_content` (targeted find-and-replace). `insert_content` and `replace_content_range` are deprecated."
+                    "description": "The kind of edit to apply. Use `insert_content` for append-only records, `update_content` for targeted find-and-replace, and `replace_content` for an intentional full-page overwrite. `replace_content_range` is legacy."
                   },
                   "replace_content": {
                     "type": "object",
                     "required": [
                       "new_str"
                     ],
-                    "description": "Provide when type is `replace_content`. Replaces the entire page content.",
+                    "description": "Provide as an object when type is `replace_content`: {\"new_str\": \"complete new content\"}. Replaces the entire page content; do not use it for ordinary append-only records.",
                     "properties": {
                       "new_str": {
                         "type": "string",
@@ -2471,7 +2471,7 @@
                     "required": [
                       "content_updates"
                     ],
-                    "description": "Provide when type is `update_content`. Applies targeted find-and-replace edits.",
+                    "description": "Provide as an object when type is `update_content`: {\"content_updates\": [{\"old_str\": \"existing text\", \"new_str\": \"replacement\"}]}. Read the page first so old_str exactly matches existing content.",
                     "properties": {
                       "content_updates": {
                         "type": "array",
@@ -2507,11 +2507,10 @@
                   },
                   "insert_content": {
                     "type": "object",
-                    "deprecated": true,
                     "required": [
                       "content"
                     ],
-                    "description": "Deprecated. Provide when type is `insert_content`. Inserts Markdown at a position.",
+                    "description": "Provide as an object when type is `insert_content`. For append-only journals, reflections, debts, and running logs, use {\"content\": \"markdown\", \"position\": {\"type\": \"end\"}}. This appends without retrieving the page first. Do not pass this object as a serialized JSON string.",
                     "properties": {
                       "content": {
                         "type": "string",

@@ -459,6 +459,46 @@ describe('MCPProxy', () => {
       )
     })
 
+    it.each([
+      ['a structured object', { content: '## Journal entry', position: { type: 'end' } }],
+      ['a JSON-encoded string', JSON.stringify({ content: '## Journal entry', position: { type: 'end' } })],
+    ])('should normalize update-page-markdown insert_content provided as %s', async (_label, insertContent) => {
+      const mockResponse = {
+        data: { id: 'updated-page-id' },
+        status: 200,
+        headers: new Headers({ 'content-type': 'application/json' }),
+      }
+      ;(HttpClient.prototype.executeOperation as ReturnType<typeof vi.fn>).mockResolvedValue(mockResponse)
+
+      ;(proxy as any).openApiLookup = {
+        'API-update-page-markdown': {
+          operationId: 'update-page-markdown',
+          responses: { '200': { description: 'Success' } },
+          method: 'patch',
+          path: '/v1/pages/{page_id}/markdown',
+        },
+      }
+
+      await callToolHandler({
+        params: {
+          name: 'API-update-page-markdown',
+          arguments: {
+            page_id: 'page-id',
+            type: 'insert_content',
+            insert_content: insertContent,
+          },
+        },
+      })
+
+      expect(HttpClient.prototype.executeOperation).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          type: 'insert_content',
+          insert_content: { content: '## Journal entry', position: { type: 'end' } },
+        }),
+      )
+    })
+
     it('should handle notion-update-page data provided as a JSON string', async () => {
       const mockResponse = {
         data: { id: 'updated-page-id' },

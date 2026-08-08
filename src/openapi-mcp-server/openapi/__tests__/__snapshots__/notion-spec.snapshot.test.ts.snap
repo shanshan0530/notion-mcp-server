@@ -375,7 +375,7 @@ Error Responses:
     ],
   },
   {
-    "description": "Notion | Update a page's content as Markdown
+    "description": "Notion | Update a page using enhanced Markdown. For append-only records such as journals, reflections, and running logs, use \`insert_content\` with \`position: {"type": "end"}\` and do not retrieve the page first. Use \`update_content\` for targeted find-and-replace edits after reading existing content, or \`replace_content\` only when intentionally overwriting the whole page. Pass the matching operation parameter as a structured object, not as a JSON-encoded string.
 Error Responses:
 400: Bad request
 403: The integration lacks the read/update content capability required for this page.

@@ -50,5 +50,20 @@ describe('Notion page-markdown tools', () => {
     expect(updateProps).toContain('type')
     expect(updateProps).toContain('replace_content')
     expect(updateProps).toContain('update_content')
+    expect(updateProps).toContain('insert_content')
+  })
+
+  it('teaches append-only markdown updates without a pre-read', () => {
+    const update = byName('update-page-markdown')!
+    expect(update.description).toContain('append-only records')
+    expect(update.description).toContain('do not retrieve the page first')
+
+    const insertSchema = update.inputSchema.properties?.insert_content as {
+      anyOf?: Array<{ description?: string }>
+    }
+    const objectSchema = insertSchema.anyOf?.find((schema) => schema.description)
+    expect(objectSchema?.description).toContain('position')
+    expect(objectSchema?.description).toContain('without retrieving the page first')
+    expect(objectSchema?.description).toContain('not pass this object as a serialized JSON string')
   })
 })
