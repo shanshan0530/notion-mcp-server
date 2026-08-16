@@ -5,6 +5,7 @@ import { OpenAPIV3 } from 'openapi-types'
 import OpenAPISchemaValidator from 'openapi-schema-validator'
 
 import { MCPProxy } from './openapi-mcp-server/mcp/proxy'
+import { NotebookMCPProxy } from './openapi-mcp-server/mcp/notebook-proxy'
 
 export class ValidationError extends Error {
   constructor(public errors: any[]) {
@@ -42,13 +43,19 @@ async function loadOpenApiSpec(specPath: string, baseUrl: string | undefined): P
   }
 }
 
+function notebookModeEnabled(): boolean {
+  return new Set(['1', 'true', 'yes', 'on']).has((process.env.NOTEBOOK_MODE ?? '').trim().toLowerCase())
+}
+
 export async function initProxy(
   specPath: string,
   baseUrl: string | undefined,
   headers?: Record<string, string>,
 ) {
   const openApiSpec = await loadOpenApiSpec(specPath, baseUrl)
-  const proxy = new MCPProxy('Notion API', openApiSpec, headers)
+  const proxy = notebookModeEnabled()
+    ? new NotebookMCPProxy('Notion Notebook', openApiSpec, headers)
+    : new MCPProxy('Notion API', openApiSpec, headers)
 
   return proxy
 }
