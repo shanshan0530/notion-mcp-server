@@ -21,6 +21,13 @@ function requireString(value: unknown, name: string): string {
   return value
 }
 
+function requireText(value: unknown, name: string): string {
+  if (typeof value !== 'string') {
+    throw new Error(`${name} must be a string.`)
+  }
+  return value
+}
+
 export class NotebookMCPProxy {
   private server: Server
   private httpClient: HttpClient
@@ -156,7 +163,7 @@ export class NotebookMCPProxy {
     const section = requireString(params.section, 'section')
     const pageId = getNotebookPageId(this.config, section)
     const oldText = requireString(params.old_text, 'old_text')
-    const newText = requireString(params.new_text, 'new_text')
+    const newText = requireText(params.new_text, 'new_text')
     const replaceAllMatches = params.replace_all_matches ?? false
 
     if (typeof replaceAllMatches !== 'boolean') {
