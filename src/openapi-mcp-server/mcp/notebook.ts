@@ -30,12 +30,13 @@ function normalizePageId(value: unknown, section: NotebookSection): string {
     throw new Error(`NOTEBOOK_PAGE_MAP is missing a page id for section: ${section}`)
   }
 
-  const normalized = value.trim().replace(/-/g, '')
+  const pageId = value.trim()
+  const normalized = pageId.replace(/-/g, '')
   if (!/^[0-9a-fA-F]{32}$/.test(normalized)) {
     throw new Error(`NOTEBOOK_PAGE_MAP contains an invalid Notion page id for section: ${section}`)
   }
 
-  return normalized
+  return pageId
 }
 
 export function loadNotebookConfig(env: NodeJS.ProcessEnv = process.env): NotebookConfig {
@@ -180,7 +181,7 @@ export const NOTEBOOK_TOOLS: Tool[] = [
         },
         new_text: {
           type: 'string',
-          description: 'Replacement Markdown text.',
+          description: 'Replacement Markdown text. May be empty when intentionally removing the matched text.',
         },
         replace_all_matches: {
           type: 'boolean',
